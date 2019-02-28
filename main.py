@@ -2,19 +2,27 @@
 from twython import Twython
 from twython import TwythonStreamer
 import json
+import urllib
+
+with open("settings.json", "r") as read_file:
+    settings = json.load(read_file)
 
 with open("auth.json", "r") as read_file:
     auth = json.load(read_file)
 
-class MyStreamer(TwythonStreamer):
-    def on_success(self, data):
-        if 'text' in data:
-            print(data['text'].encode('utf-8'))
-        # Want to disconnect after the first result?
-        # self.disconnect()
+photo_list = []
 
-    def on_error(self, status_code, data):
-        print(status_code, data)
+class MyStreamer(TwythonStreamer):
+	def on_success(self, data):
+		if 'extended_entities' in data and 'media' in data['extended_entities']:
+			for i in data['extended_entities']['media']:
+				if i['type'] == 'photo':
+					print(f"{i['media_url']} https://twitter.com/user/status/{data['id_str']}")
+					photo_list.append({'url': i['media_url'], 'id': data['id_str']})
+		
+
+	def on_error(self, status_code, data):
+		print(status_code, data)
 
 
 
@@ -23,11 +31,7 @@ def main():
 	stream = MyStreamer(auth['APP_KEY'], auth['APP_SECRET'],
 						auth['OAUTH_TOKEN'], auth['OAUTH_TOKEN_SECRET'])
 
-	stream.statuses.filter(track='twitter')
-	# stream.user()
-	# Read the authenticated users home timeline
-	# (what they see on Twitter) in real-time
-	# stream.site(follow='twitter')
+	stream.statuses.filter(track=settings['track'])
 
 if __name__ == "__main__":
 	main()
