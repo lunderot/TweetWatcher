@@ -7,6 +7,7 @@ import threading
 import time
 import urllib.request
 import cv2
+import cvlib as cv
 import numpy as np
 
 with open("settings.json", "r") as read_file:
@@ -21,32 +22,39 @@ processed_list = []
 class FaceScanner():
 	def __init__(self):
 		self.processed = 0
-		self.interval = 1
+		self.interval = 0.01
 		threading.Thread(target=self.face_scanner).start()
 	
 	def face_scanner(self):
 		while(True):
 			if len(photo_list) > self.processed:
 				image = self.download_photo(photo_list[self.processed]['url'])
-				faces = self.detect_faces(image)
-				if len(faces) > 0:
-					processed_list.append({	'url': photo_list[self.processed]['media_url'],
-											'id': photo_list[self.processed]['id_str'],
-											'faces': faces
+				faces, _ = cv.detect_face(image)
+				for f in faces:
+					gender = self.detect_gender(image, f)
+					processed_list.append({	'url': photo_list[self.processed]['url'],
+											'id': photo_list[self.processed]['id'],
+											'gender': gender,
+											'box': [[f[0], f[1]], [f[2], f[3]]]
 											})
+					print(processed_list[-1])
 				self.processed += 1
 			time.sleep(self.interval)
 	
+	def detect_gender(self, image, f):
+		(startX,startY) = f[0],f[1]
+		(endX,endY) = f[2],f[3]
+		face_crop = np.copy(image[startY:endY, startX:endX])
+		(label, confidence) = cv.detect_gender(face_crop)
+		index = np.argmax(confidence)
+		gender = label[index]
+		return gender
+
 	def download_photo(self, url):
-		response = urllib.request.urlopen(url)
+		response = urllib.request.urlopen(url)	
 		image = np.asarray(bytearray(response.read()), dtype="uint8")
 		image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 		return image
-	
-	def detect_faces(self, image):
-		gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-		cascade_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-		return cascade_classifier.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30,30), flags = cv2.CASCADE_SCALE_IMAGE)
 
 
 
