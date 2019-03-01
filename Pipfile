@@ -8,6 +8,8 @@ pylint = "*"
 
 [packages]
 twython = "*"
+opencv-python = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.7"
