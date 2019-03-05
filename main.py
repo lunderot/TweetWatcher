@@ -39,12 +39,14 @@ class FaceScanner():
 											})
 					print(processed_list[-1])
 				self.processed += 1
-			time.sleep(self.interval)
+			else:
+				time.sleep(self.interval)
 	
-	def detect_gender(self, image, f):
-		(startX,startY) = f[0],f[1]
-		(endX,endY) = f[2],f[3]
-		face_crop = np.copy(image[startY:endY, startX:endX])
+	def detect_gender(self, image, face_coords):
+		height, width, _ = image.shape
+		x0, x1 = np.clip(face_coords[0:3:2], 0, width)
+		y0, y1 = np.clip(face_coords[1:4:2], 0, height)
+		face_crop = np.copy(image[y0:y1, x0:x1])
 		(label, confidence) = cv.detect_gender(face_crop)
 		index = np.argmax(confidence)
 		gender = label[index]
