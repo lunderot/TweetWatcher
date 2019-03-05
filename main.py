@@ -31,7 +31,12 @@ class FaceScanner():
 				image = self.download_photo(photo_list[self.processed]['url'])
 				faces, _ = cv.detect_face(image)
 				for f in faces:
-					gender = self.detect_gender(image, f)
+					w, h = image.shape[:2]
+					x0, x1 = np.clip(f[0:3:2], 0, w) #cap the coordinates to the image size
+					y0, y1 = np.clip(f[1:4:2], 0, h)
+					if x0 == x1 or y0 == y1: #if the capped coordinates are equal, the image is outside of the bounds; ignore it
+						break
+					gender = self.detect_gender(image, [x0, y0, x1, y1])
 					processed_list.append({	'url': photo_list[self.processed]['url'],
 											'id': photo_list[self.processed]['id'],
 											'gender': gender,
@@ -43,11 +48,10 @@ class FaceScanner():
 				time.sleep(self.interval)
 	
 	def detect_gender(self, image, face_coords):
-		height, width, _ = image.shape
-		x0, x1 = np.clip(face_coords[0:3:2], 0, width)
-		y0, y1 = np.clip(face_coords[1:4:2], 0, height)
+		x0, x1 = face_coords[0:3:2]
+		y0, y1 = face_coords[1:4:2]
 		face_crop = np.copy(image[y0:y1, x0:x1])
-		(label, confidence) = cv.detect_gender(face_crop)
+		label, confidence = cv.detect_gender(face_crop)
 		index = np.argmax(confidence)
 		gender = label[index]
 		return gender
