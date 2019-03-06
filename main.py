@@ -7,6 +7,10 @@ import cv2
 import cvlib as cv
 import numpy as np
 from twython import TwythonStreamer
+from wsgiref.simple_server import make_server
+from pyramid.config import Configurator
+from pyramid.response import Response
+from pyramid.response import FileResponse
 
 with open("settings.json", "r") as read_file:
     settings = json.load(read_file)
@@ -21,7 +25,7 @@ class FaceScanner():
     def __init__(self):
         self.processed = 0
         self.interval = 0.01
-        threading.Thread(target=self.face_scanner).start()    
+        threading.Thread(target=self.face_scanner).start()
     def face_scanner(self):
         while(True):
             if len(photo_list) > self.processed:
@@ -37,7 +41,10 @@ class FaceScanner():
                     processed_list.append({	'url': photo_list[self.processed]['url'],
                                             'id': photo_list[self.processed]['id'],
                                             'gender': gender,
-                                            'box': [[f[0], f[1]], [f[2], f[3]]]
+                                            'box': {'x0':np.uint32(f[0]).item(),
+                                                    'x1':np.uint32(f[2]).item(),
+                                                    'y0':np.uint32(f[1]).item(),
+                                                    'y1':np.uint32(f[3]).item()}
                                             })
                     print(processed_list[-1])
                 self.processed += 1
@@ -78,6 +85,29 @@ def twitter_stream():
     stream = MyStreamer(auth['APP_KEY'], auth['APP_SECRET'], auth['OAUTH_TOKEN'], auth['OAUTH_TOKEN_SECRET'])
     stream.statuses.filter(track=settings['track'])
 
+def web_static(request):
+    filename = request.matchdict["name"]
+    return FileResponse(f'web/{filename}')
+
+def web_index(request):
+    return FileResponse('web/index.html')
+
+def web_data(request):
+    return Response(json.dumps(processed_list))
+
 if __name__ == "__main__":
     FaceScanner()
-    twitter_stream()
+    threading.Thread(target=twitter_stream).start()
+    
+    with Configurator() as config:
+        config.add_route('index', '/')
+        config.add_view(web_index, route_name='index')
+        
+        config.add_route('data', '/data')
+        config.add_view(web_data, route_name='data')
+
+        config.add_route('static', '/{name}')
+        config.add_view(web_static, route_name='static')
+        app = config.make_wsgi_app()
+    server = make_server('0.0.0.0', 8080, app)
+    server.serve_forever()
