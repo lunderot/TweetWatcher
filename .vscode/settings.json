@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\Mattias\\.virtualenvs\\TweetWatcher-5WJkQMuT\\Scripts\\python.exe"
+    "python.pythonPath": "C:\\Users\\Mattias\\.virtualenvs\\TweetWatcher-5WJkQMuT\\Scripts\\python.exe",
+    "python.linting.pylintArgs": ["--extension-pkg-whitelist=cv2"]
 }
