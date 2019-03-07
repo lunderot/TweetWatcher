@@ -87,7 +87,12 @@ def twitter_stream():
 
 def web_static(request):
     filename = request.matchdict["name"]
-    return FileResponse(f'web/{filename}')
+    try:
+        response = FileResponse(f'web/{filename}')
+    except IOError:
+        response = Response()
+        response.status_int = 404
+    return response
 
 def web_index(request):
     return FileResponse('web/index.html')
@@ -96,18 +101,19 @@ def web_data(request):
     return Response(json.dumps(processed_list))
 
 if __name__ == "__main__":
-    FaceScanner()
-    threading.Thread(target=twitter_stream).start()
-    
+    #FaceScanner()
+    #threading.Thread(target=twitter_stream).start()
+
     with Configurator() as config:
         config.add_route('index', '/')
         config.add_view(web_index, route_name='index')
-        
+
         config.add_route('data', '/data')
         config.add_view(web_data, route_name='data')
 
         config.add_route('static', '/{name}')
         config.add_view(web_static, route_name='static')
+
         app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 8080, app)
     server.serve_forever()

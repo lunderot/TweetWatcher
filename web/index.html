@@ -1,8 +1,104 @@
+<!DOCTYPE html>
 <html>
-	<header>
-
-	</header>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Hello Bulma!</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+		<link rel="stylesheet" href="style.css">
+	</head>
 	<body>
-		Hi ho world!
+		<script src="main.js"></script>
+		<section class="section">
+			<div class="box">
+				<h1 class="title">Statistics</h1>
+				<div class="columns">
+					<div class="column">
+						<p>Tweets per hour: <span class="tweets_per_hour"></span></p>
+						<p>Men in images per hour: <span class="men_per_hour"></span></p>
+						<p>Women in images per hour: <span class="women_per_hour"></span></p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section">
+			<div class="box">
+				<h1 class="title">Settings</h1>
+				<div class="columns">
+					<div class="column is-one-quarter">
+							<div class="field">
+								<label class="label">Watch terms</label>
+								<p class="control">
+									<input class="input terms" placeholder="#fashion">
+								</p>
+							</div>
+							<div class="field">
+								<p class="control">
+									<button class="button is-success submit_terms">Submit</button>
+								</p>
+							</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section tweet_images">
+			<div class="box">
+				<h1 class="title">Last processed images</h1>
+				<div class="columns">
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+				</div>
+				<div class="columns">
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+					<div class="column is-one-fifth">
+						<figure class="image is-square">
+							<img class="tweet_image" src="https://bulma.io/images/placeholders/128x128.png">
+						</figure>
+					</div>
+				</div>
+			</div>
+		</section>
 	</body>
 </html>
