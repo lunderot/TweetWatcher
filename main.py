@@ -19,7 +19,14 @@ with open("auth.json", "r") as read_file:
     auth = json.load(read_file)
 
 photo_list = []
-processed_list = []
+processed_list = {
+    'tweets_per_hour': 0,
+    'men_per_hour': 0,
+    'women_per_hour': 0,
+    'man': 0,
+    'woman': 0,
+    'images': []
+}
 
 class FaceScanner():
     def __init__(self):
@@ -38,15 +45,10 @@ class FaceScanner():
                     if x0 == x1 or y0 == y1: #if the capped coordinates are equal, the image is outside of the bounds; ignore it
                         break
                     gender = self.detect_gender(image, [x0, y0, x1, y1])
-                    processed_list.append({	'url': photo_list[self.processed]['url'],
-                                            'id': photo_list[self.processed]['id'],
-                                            'gender': gender,
-                                            'box': {'x0':np.uint32(f[0]).item(),
-                                                    'x1':np.uint32(f[2]).item(),
-                                                    'y0':np.uint32(f[1]).item(),
-                                                    'y1':np.uint32(f[3]).item()}
-                                            })
-                    print(processed_list[-1])
+                    processed_list[gender] += 1
+                processed_list['images'].append(photo_list[self.processed]['url'])
+                if len(processed_list['images']) > 10:
+                    processed_list['images'].pop(0)
                 self.processed += 1
             else:
                 time.sleep(self.interval)
@@ -61,7 +63,7 @@ class FaceScanner():
         return gender
 
     def download_photo(self, url):
-        response = urllib.request.urlopen(url)	
+        response = urllib.request.urlopen(url)
         image = np.asarray(bytearray(response.read()), dtype="uint8")
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
         return image
@@ -101,8 +103,8 @@ def web_data(request):
     return Response(json.dumps(processed_list))
 
 if __name__ == "__main__":
-    #FaceScanner()
-    #threading.Thread(target=twitter_stream).start()
+    FaceScanner()
+    threading.Thread(target=twitter_stream).start()
 
     with Configurator() as config:
         config.add_route('index', '/')
