@@ -1,17 +1,4 @@
-/*
-#terms
-#submit_terms
-
-.tweet_images
-.tweet_image
-
-#tweets_per_hour
-#men_per_hour
-#women_per_hour
-*/
-
-function update()
-{
+function update(){
 	fetch('/data')
 	.then((resp) => resp.json())
 	.then(function(data) {
@@ -25,7 +12,19 @@ function update()
 	})
 }
 
+function post(){
+	fetch('/post', {
+		method: 'POST',
+		headers: new Headers(),
+		body: JSON.stringify({'track':document.querySelector('#terms').value.split(' ')})
+	})
+	.then(function(){
+		document.querySelector('#terms').value = '';
+	})
+}
+
 window.onload = function(){
+	document.querySelector('#submit_terms').onclick = post;
 	update()
 	setInterval(update, 5000)
 }

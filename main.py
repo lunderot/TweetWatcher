@@ -12,12 +12,8 @@ from pyramid.config import Configurator
 from pyramid.response import Response
 from pyramid.response import FileResponse
 
-with open("settings.json", "r") as read_file:
-    settings = json.load(read_file)
-
-with open("auth.json", "r") as read_file:
-    auth = json.load(read_file)
-
+settings = {}
+auth = {}
 photo_list = []
 processed_list = {
     'tweets_per_hour': 0,
@@ -34,9 +30,12 @@ class FaceScanner():
         self.interval = 0.01
         threading.Thread(target=self.face_scanner).start()
     def face_scanner(self):
-        while(True):
+        while True:
             if len(photo_list) > self.processed:
+                print(f'Processing {photo_list[self.processed]}')
                 image = self.download_photo(photo_list[self.processed]['url'])
+                if image is None:
+                    break
                 faces, _ = cv.detect_face(image)
                 for f in faces:
                     w, h = image.shape[:2]
@@ -64,7 +63,10 @@ class FaceScanner():
 
     def download_photo(self, url):
         response = urllib.request.urlopen(url)
-        image = np.asarray(bytearray(response.read()), dtype="uint8")
+        try:
+            image = np.asarray(bytearray(response.read()), dtype="uint8")
+        except (http.client.IncompleteRead) as e:
+            return None
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
         return image
 
@@ -102,7 +104,19 @@ def web_index(request):
 def web_data(request):
     return Response(json.dumps(processed_list))
 
+def web_post(request):
+    settings = json.loads(request.body)
+    with open('settings.json', 'w') as file:
+        json.dump(settings, file)
+    return Response(json.dumps({'data':'success'}))
+
 if __name__ == "__main__":
+    with open("settings.json", "r") as read_file:
+        settings = json.load(read_file)
+
+    with open("auth.json", "r") as read_file:
+        auth = json.load(read_file)
+
     FaceScanner()
     threading.Thread(target=twitter_stream).start()
 
@@ -112,6 +126,9 @@ if __name__ == "__main__":
 
         config.add_route('data', '/data')
         config.add_view(web_data, route_name='data')
+
+        config.add_route('post', '/post')
+        config.add_view(web_post, route_name='post')
 
         config.add_route('static', '/{name}')
         config.add_view(web_static, route_name='static')
