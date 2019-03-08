@@ -31,10 +31,10 @@ class FaceScanner():
     def face_scanner(self):
         while True:
             if len(photo_list) > self.processed:
-                print(f'Processing {photo_list[self.processed]}')
                 image = self.download_photo(photo_list[self.processed]['url'])
                 if image is None:
-                    break
+                    self.processed += 1
+                    continue
                 faces, _ = cv.detect_face(image)
                 for f in faces:
                     w, h = image.shape[:2]
@@ -61,10 +61,13 @@ class FaceScanner():
         return gender
 
     def download_photo(self, url):
-        print('started download')
-        response = requests.get(url)
+        try:
+            response = requests.get(url, timeout=5)
+        except:
+            return None
+        if len(response.content) == 0:
+            return None
         image = np.asarray(bytearray(response.content), dtype="uint8")
-        print('finished download')
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
         return image
 
