@@ -1,6 +1,4 @@
 import json
-import urllib
-import urllib.request
 import threading
 import time
 import cv2
@@ -11,6 +9,7 @@ from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
 from pyramid.response import FileResponse
+import requests
 
 settings = {}
 auth = {}
@@ -62,11 +61,10 @@ class FaceScanner():
         return gender
 
     def download_photo(self, url):
-        response = urllib.request.urlopen(url)
-        try:
-            image = np.asarray(bytearray(response.read()), dtype="uint8")
-        except (http.client.IncompleteRead) as e:
-            return None
+        print('started download')
+        response = requests.get(url)
+        image = np.asarray(bytearray(response.content), dtype="uint8")
+        print('finished download')
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
         return image
 
