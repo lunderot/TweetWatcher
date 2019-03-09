@@ -14,6 +14,8 @@ import requests
 settings = {}
 auth = {}
 photo_list = []
+twitter_tracker = None
+twitter_tracker_stop = False
 processed_list = {
     'tweets_per_hour': 0,
     'men_per_hour': 0,
@@ -75,6 +77,9 @@ class FaceScanner():
 
 class MyStreamer(TwythonStreamer):
     def on_success(self, data):
+        global twitter_tracker_stop
+        if twitter_tracker_stop:
+            self.disconnect()
         if 'extended_entities' in data and 'media' in data['extended_entities']:
             for i in data['extended_entities']['media']:
                 if i['type'] == 'photo':
@@ -87,8 +92,10 @@ class MyStreamer(TwythonStreamer):
 
 
 def twitter_stream():
-    stream = MyStreamer(auth['APP_KEY'], auth['APP_SECRET'], auth['OAUTH_TOKEN'], auth['OAUTH_TOKEN_SECRET'])
-    stream.statuses.filter(track=settings['track'])
+    while True:
+        global twitter_tracker_stop
+        twitter_tracker_stop = False
+        twitter_tracker.statuses.filter(track=settings['track'])
 
 def web_static(request):
     filename = request.matchdict["name"]
@@ -106,7 +113,10 @@ def web_data(request):
     return Response(json.dumps(processed_list))
 
 def web_post(request):
+    global settings
     settings = json.loads(request.body)
+    global twitter_tracker_stop
+    twitter_tracker_stop = True
     with open('settings.json', 'w') as file:
         json.dump(settings, file)
     return Response(json.dumps({'data':'success'}))
@@ -119,6 +129,7 @@ if __name__ == "__main__":
         auth = json.load(read_file)
 
     FaceScanner()
+    twitter_tracker = MyStreamer(auth['APP_KEY'], auth['APP_SECRET'], auth['OAUTH_TOKEN'], auth['OAUTH_TOKEN_SECRET'])
     threading.Thread(target=twitter_stream).start()
 
     with Configurator() as config:
