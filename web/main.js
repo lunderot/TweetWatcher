@@ -8,7 +8,7 @@ function update(){
 		})
 		document.querySelector('#tweets_per_hour').innerHTML = data.tweets_per_hour.toString()
 		document.querySelector('#men_per_hour').innerHTML = data.men_per_hour.toString()
-		document.querySelector('#women_per_hour').innerHTML = data.men_per_hour.toString()
+		document.querySelector('#women_per_hour').innerHTML = data.women_per_hour.toString()
 	})
 }
 

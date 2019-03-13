@@ -11,11 +11,29 @@ from pyramid.response import Response
 from pyramid.response import FileResponse
 import requests
 
+class RunningAverage():
+    def __init__(self, interval = 3600):
+        self.list = []
+        self.initial_time = time.time()
+        self.interval = interval
+
+    def append(self, amount = 1):
+        index = int((time.time()-self.initial_time)/self.interval)
+        if len(self.list) <= index:
+            self.list.append(0)
+        self.list[index] += amount
+
+    def get(self):
+        return sum(self.list)/len(self.list)
+
 settings = {}
 auth = {}
 photo_list = []
 twitter_tracker = None
 twitter_tracker_stop = False
+running_average_men = RunningAverage()
+running_average_women = RunningAverage()
+running_average_tweets = RunningAverage()
 processed_list = {
     'tweets_per_hour': 0,
     'men_per_hour': 0,
@@ -46,6 +64,10 @@ class FaceScanner():
                         break
                     gender = self.detect_gender(image, [x0, y0, x1, y1])
                     processed_list[gender] += 1
+                    if gender == 'man':
+                        running_average_men.append()
+                    else:
+                        running_average_women.append()
                 processed_list['images'].append(photo_list[self.processed]['url'])
                 if len(processed_list['images']) > 10:
                     processed_list['images'].pop(0)
@@ -80,6 +102,7 @@ class MyStreamer(TwythonStreamer):
         global twitter_tracker_stop
         if twitter_tracker_stop:
             self.disconnect()
+        running_average_tweets.append()
         if 'extended_entities' in data and 'media' in data['extended_entities']:
             for i in data['extended_entities']['media']:
                 if i['type'] == 'photo':
@@ -88,7 +111,6 @@ class MyStreamer(TwythonStreamer):
 
     def on_error(self, status_code, data):
         print(status_code, data)
-
 
 
 def twitter_stream():
@@ -110,6 +132,9 @@ def web_index(request):
     return FileResponse('web/index.html')
 
 def web_data(request):
+    processed_list['tweets_per_hour'] = running_average_tweets.get()
+    processed_list['men_per_hour'] = running_average_men.get()
+    processed_list['women_per_hour'] = running_average_women.get()
     return Response(json.dumps(processed_list))
 
 def web_post(request):
@@ -122,6 +147,7 @@ def web_post(request):
     return Response(json.dumps({'data':'success'}))
 
 if __name__ == "__main__":
+    running_average_intitial_time = time.time()
     with open("settings.json", "r") as read_file:
         settings = json.load(read_file)
 
