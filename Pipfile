@@ -17,7 +17,7 @@ Pillow = "*"
 Keras = "*"
 cvlib = "*"
 pyramid = "*"
-pyyaml = "*"
+pyyaml = ">=4.2b1"
 
 [requires]
 python_version = "3.7"
