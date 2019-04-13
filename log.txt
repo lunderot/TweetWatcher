@@ -1,0 +1,30 @@
+28/2 11:17
+28/2 12:17 - Hade problem med att på twitter-telefon verifiering att fungera
+28/2 13:36
+28/2 14:08 - Har fått twitter verifiering att fungera, har gjort utveklar-miljön
+28/2 14:08
+28/2 14:48 - Fick twitter streaming att fungera
+28/2 14:48
+28/2 16:08 - 
+28/2 16:42
+28/2 18:00 - Programmet filtrerar nu ut tweets med bilder i dem
+1/3 09:35
+1/3 11:30 - Programmet kan nu räkna hur många ansikten det är i varje bild
+1/3 21:23
+1/3 23:00 - Programmet kan avgöra om ansiktet är man eller kvinna
+5/3 16:18
+5/3 17:18 - Kollade på webservar i python, flask
+6/3 13:10
+6/3 14:30 - Programmet kan hosta en webserver
+7/3 13:43
+7/3 16:30 - Programmet kan uppdatera bilder i realtid
+8/3 13:55
+8/3 15:21 - Programmet kan ta emot post request för att uppdatera tracking terms
+8/3 21:04
+8/3 23:04 - Fixade att programmet slutade ladda ner bilder efter ett tag
+9/3 20:00 
+9/3 21:00 -
+13/3 13:13
+13/3 14:20 - Running average fungerar
+
+Total tid: 19:02
