@@ -1,0 +1,20 @@
+Varför python?
+Jag visste att jag behöver opencv och twitter-api och en webserver för gui.
+Python har en bra paket-hanterare och jag har jobbat lite i det innan.
+Jag valde också att göra GUI i webläsaren för att jag visste att det finns färdiga css-bibliotek  som gör det enkelt att fungera i flera olika webbläsare och jag har jobbat med javascript innan.
+
+Vad hade jag kunnat göra bättre?
+När jag har läst på lite mer i efterhand så skulle man kunna anända köer med trådar som redan finns inbyggt i python.
+När jag skrev koden visste jag inte riktigt hur jag skulle göra det.
+
+GUI
+Med javascript-sidan så kunde jag gjort det lite bättre genom att använda samma funktion-syntax (arrow function) överallt istället för att blanda.
+Annars tycker jag koden gör det den ska utan att vara komplicerad.
+
+Buggar/förbättringar
+Programmet tar bara mer och mer minne hela tiden, photo_list töms aldrig.
+Programmet skulle kunna ladda ner foton separat istället för i samma tråd som face-detection
+Programmet verkar ta med re-tweets med samma bilder.
+
+Mer funktionalitet
+Att spara databas med bilder och statistik
